@@ -4,6 +4,8 @@
       striped
       :items="tableItems"
       :fields="fields"
+      :per-page="restCountriesTablePerPage"
+      :current-page="restCountriesTableCurrentPage"
       class="rest-countries-table"
     >
       <template v-slot:cell(flag)="data">
@@ -15,6 +17,12 @@
         }}</b-button>
       </template>
     </b-table>
+    <b-pagination
+      align="right"
+      v-model="restCountriesTableCurrentPage"
+      :total-rows="restCountriesTableRows"
+      :per-page="restCountriesTablePerPage"
+    ></b-pagination>
     <b-modal
       ref="country-moreinfo"
       scrollable
@@ -63,6 +71,8 @@ export default {
     return {
       restCountriesData: [],
       restCountriesActiveIndex: Number,
+      restCountriesTablePerPage: 25,
+      restCountriesTableCurrentPage: 1,
       fields: [
         {
           key: "flag",
@@ -125,6 +135,11 @@ export default {
     showCountryMoreInfo: function (rowIndex) {
       this.restCountriesActiveIndex = rowIndex;
       this.$refs["country-moreinfo"].show();
+    },
+  },
+  computed: {
+    restCountriesTableRows() {
+      return this.restCountriesData.length;
     },
   },
   created() {
