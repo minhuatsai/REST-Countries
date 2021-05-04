@@ -1,11 +1,21 @@
 <template>
-  <div class="home">
+  <div class="home text-left">
+    <div class="search-wrapper my-3 px-2">
+      <input
+        type="text"
+        class="input-filter-country form-control"
+        placeholder="Filter country..."
+        v-model="filterCountry"
+      />
+    </div>
     <b-table
       striped
-      :items="tableItems"
+      :items="getTableItems"
       :fields="fields"
+      :filter="filterCountry"
       :per-page="restCountriesTablePerPage"
       :current-page="restCountriesTableCurrentPage"
+      @filtered="afterFilterTable"
       class="rest-countries-table"
     >
       <template v-slot:cell(flag)="data">
@@ -73,6 +83,8 @@ export default {
       restCountriesActiveIndex: Number,
       restCountriesTablePerPage: 25,
       restCountriesTableCurrentPage: 1,
+      restCountriesTableRows: 0,
+      filterCountry: "",
       fields: [
         {
           key: "flag",
@@ -136,15 +148,24 @@ export default {
       this.restCountriesActiveIndex = rowIndex;
       this.$refs["country-moreinfo"].show();
     },
+    afterFilterTable(filteredItems) {
+      this.restCountriesTableRows = filteredItems.length;
+      this.currentPage = 1;
+    },
   },
   computed: {
-    restCountriesTableRows() {
-      return this.restCountriesData.length;
+    getTableItems() {
+      const filtered = this.tableItems.filter((tableItem) => {
+        console.log(tableItem.name.toLowerCase());
+        return tableItem.name.toLowerCase().includes(this.filterCountry);
+      });
+      return filtered;
     },
   },
   created() {
     getRestCountries((data) => {
       this.restCountriesData = data;
+      this.restCountriesTableRows = this.restCountriesData.length;
       this.setTable(data);
     });
   },
@@ -155,6 +176,9 @@ img.flag-icon {
   max-width: 30px;
 }
 .home {
+  .input-filter-country {
+    max-width: 300px;
+  }
   .rest-countries-table {
     .name-field {
       button {
